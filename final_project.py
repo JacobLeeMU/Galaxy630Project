@@ -55,7 +55,21 @@ for i in range(len(image_subset)):
     for j in range(len(num_iter)):
         if j == 0:
             ## classify galaxy, also describe and explain galaxy
-            prompt = "Please classify the galaxy in this image into one of the following: 'barred spiral', 'unbarred tight spiral', 'unbarred loose spiral', 'edge-on without bulge', or 'edge-on with bulge', and generate a description of the morphology of the galaxy including features such as: number of spiral arms, presence or absence of dust lanes, color, and diffuseness, and state what you conclude about the galaxy from these observations."
+            
+            prompts = []
+            
+            prompt0 = "Describe what you see in this image."  
+            
+            prompt1 = "Is the galaxy in this image viewed edge on or not?" 
+            
+            #prompt2 = "Does the galaxy appear to have a central bulge?"
+            
+            prompt2 = "Is there a bar feature at the center of the galaxy?"
+            
+            prompt3 = "Does this galaxy have a spiral arm pattern?" 
+            
+            prompt4 = "Is the central galaxy in this image more red or blue in color? What does this indicate about the galaxy's age and rate of star formation as a result?"             
+            prompt5 =  "Please classify the galaxy in this image into one of the following: 'barred spiral', 'unbarred tight spiral', 'unbarred loose spiral', 'edge-on without bulge', or 'edge-on with bulge'"       
 
             question = "<image>\n"+prompt
 
