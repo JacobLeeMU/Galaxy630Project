@@ -15,7 +15,7 @@ PROJECT_NAME = os.path.basename(os.getcwd())
 # directories
 SCRATCH_DIR = os.path.join("/anvil/scratch/x-mwhite2", PROJECT_NAME)
 MODEL_PATH = os.path.join(SCRATCH_DIR, "models", "llava-7b")
-DATASET_PATH = os.path.join(SCRATCH_DIR, "datasets", "Galaxy10_DECals.h5")
+DATASET_PATH = os.path.join(SCRATCH_DIR, "datasets", "galaxy_sample15.h5")
 
 with h5py.File(DATASET_PATH, 'r') as F:
     images = np.array(F['images'])
