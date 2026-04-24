@@ -92,7 +92,7 @@ for i in range(len(image_subset)):
         else:
             responses = []
             for k, p in enumerate(prompt):
-                revision_cue = "<image>\n"+f"Here is the previous prompt for the attached image: {p} \n the corresponding output was: {responses[i]} \n Critique this output and provide an improved response if possible"
+                revision_cue = "<image>\n"+f"Here is the previous prompt for the attached image: {p} \n the corresponding output was: {responses[j-1][k]} \n Critique this output and provide an improved response if possible"
                 print("model response:", response)
                 inputs = processor(text=revision_cue, images=image, return_tensors="pt").to(device)
                 print("generating revision...")
