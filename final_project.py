@@ -5,8 +5,8 @@ import h5py
 import json
 from tensorflow.keras import utils
 
-#from PIL import Image
-#from transformers import LlavaForConditionalGeneration, AutoProcessor
+from PIL import Image
+from transformers import LlavaForConditionalGeneration, AutoProcessor
 
 #from datasets import load_dataset
 
@@ -100,3 +100,11 @@ for i in range(len(image_subset)):
                 response = processor.decode(output[0], skip_special_tokens=True)
                 responses.append(response)
             response_list.append(responses)
+
+with open("results.txt", "w") as f:
+    for i,q in enumerate(questions):
+        f.write(f"Question {i+1}: {q}")
+        for j,r in enumerate(responses[i]):
+            f.write(f"Revision {j}: {r}")
+        f.write("\n\n")
+
