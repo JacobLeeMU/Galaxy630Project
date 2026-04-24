@@ -52,6 +52,7 @@ for i in range(len(image_subset)):
     print("caption:", label_subset[i])
     image = Image.open(image_subset[i].convert("RGB"))
 
+    response_list = []
     for j in range(len(num_iter)):
         if j == 0:
             ## classify galaxy, also describe and explain galaxy
@@ -68,7 +69,8 @@ for i in range(len(image_subset)):
             
             prompt.append("Does this galaxy have a spiral arm pattern?")
             
-            prompt.append("Is the central galaxy in this image more red or blue in color? What does this indicate about the galaxy's age and rate of star formation as a result?")      
+            prompt.append("Is the central galaxy in this image more red or blue in color? What does this indicate about the galaxy's age and rate of star formation as a result?")
+
             prompt.append("Please classify the galaxy in this image into one of the following: 'barred spiral', 'unbarred tight spiral', 'unbarred loose spiral', 'edge-on without bulge', or 'edge-on with bulge'")
 
 
@@ -86,17 +88,16 @@ for i in range(len(image_subset)):
                 # print output
                 print("question:", question)
                 print("model response:", response)
+            
+            response_list.append(responses)
 
         else:
-            revision_cue = "<image>\n"+f"Here is the previous output describing the image: {response} \
-                        Critique this output and print an improved classification and summary \
-                        of the image. Here is the previous prompt: {prompt}"
-
-            inputs = processor(text=revision_cue, images=image, return_tensors="pt").to(device)
-            print("generating caption...")
-            output = model.generate(**inputs, max_new_tokens=50)
-            response = processor.decode(output[0], skip_special_tokens=True)
-
-            # print output
-            print("question:", question)
-            print("model response:", response)
+            responses = []
+            for k, p in enumerate(prompt):
+                revision_cue = "<image>\n"+f"Here is the previous prompt for the attached image: {p} \n the corresponding output was: {responses[i]} \n Critique this output and provide an improved response if possible"
+                print("model response:", response)
+                inputs = processor(text=revision_cue, images=image, return_tensors="pt").to(device)
+                print("generating revision...")
+                output = model.generate(**inputs, max_new_tokens=50)
+                response = processor.decode(output[0], skip_special_tokens=True)
+            response_list.append(responses)
