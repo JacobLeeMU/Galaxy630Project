@@ -73,8 +73,6 @@ for i in range(len(image_subset)):
 
             prompt.append("Please classify the galaxy in this image into one of the following: 'barred spiral', 'unbarred tight spiral', 'unbarred loose spiral', 'edge-on without bulge', or 'edge-on with bulge'")
 
-
-
             responses = []
             for p in prompt:
                 question = "<image>\n"+p
@@ -100,4 +98,5 @@ for i in range(len(image_subset)):
                 print("generating revision...")
                 output = model.generate(**inputs, max_new_tokens=50)
                 response = processor.decode(output[0], skip_special_tokens=True)
+                responses.append(response)
             response_list.append(responses)
