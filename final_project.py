@@ -56,31 +56,36 @@ for i in range(len(image_subset)):
         if j == 0:
             ## classify galaxy, also describe and explain galaxy
             
-            prompts = []
+            prompt = []
             
-            prompt0 = "Describe what you see in this image."  
+            prompt.append("Describe what you see in this image.")
             
-            prompt1 = "Is the galaxy in this image viewed edge on or not?" 
+            prompt.append("Is the galaxy in this image viewed edge on or not?")
             
-            #prompt2 = "Does the galaxy appear to have a central bulge?"
+            #prompt.append("Does the galaxy appear to have a central bulge?")
             
-            prompt2 = "Is there a bar feature at the center of the galaxy?"
+            prompt.append("Is there a bar feature at the center of the galaxy?")
             
-            prompt3 = "Does this galaxy have a spiral arm pattern?" 
+            prompt.append("Does this galaxy have a spiral arm pattern?")
             
-            prompt4 = "Is the central galaxy in this image more red or blue in color? What does this indicate about the galaxy's age and rate of star formation as a result?"             
-            prompt5 =  "Please classify the galaxy in this image into one of the following: 'barred spiral', 'unbarred tight spiral', 'unbarred loose spiral', 'edge-on without bulge', or 'edge-on with bulge'"       
+            prompt.append("Is the central galaxy in this image more red or blue in color? What does this indicate about the galaxy's age and rate of star formation as a result?")      
+            prompt.append("Please classify the galaxy in this image into one of the following: 'barred spiral', 'unbarred tight spiral', 'unbarred loose spiral', 'edge-on without bulge', or 'edge-on with bulge'")
 
-            question = "<image>\n"+prompt
 
-            inputs = processor(text=question, images=image, return_tensors="pt").to(device)
-            print("generating caption...")
-            output = model.generate(**inputs, max_new_tokens=50)
-            response = processor.decode(output[0], skip_special_tokens=True)
-            
-            # print output
-            print("question:", question)
-            print("model response:", response)
+
+            responses = []
+            for p in prompt:
+                question = "<image>\n"+p
+
+                inputs = processor(text=question, images=image, return_tensors="pt").to(device)
+                print("generating caption...")
+                output = model.generate(**inputs, max_new_tokens=50)
+                response = processor.decode(output[0], skip_special_tokens=True)
+                responses.append(response)
+
+                # print output
+                print("question:", question)
+                print("model response:", response)
 
         else:
             revision_cue = "<image>\n"+f"Here is the previous output describing the image: {response} \
