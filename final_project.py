@@ -104,7 +104,7 @@ for i in range(len(image_subset)):
 with open("results.txt", "w") as f:
     for i,q in enumerate(questions):
         f.write(f"Question {i+1}: {q}")
-        for j,r in enumerate(responses[i]):
+        for j,r in enumerate(responses[:,i]):
             f.write(f"Revision {j}: {r}")
         f.write("\n\n")
 
