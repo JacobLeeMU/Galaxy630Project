@@ -91,7 +91,7 @@ for i in range(len(image_subset)):
 
         else:
             responses = []
-            for k, p in enumerate(prompt):
+            for k, p in enumerate(prompts):
                 revision_cue = "<image>\n"+f"Here is the previous prompt for the attached image: {p} \n the corresponding output was: {responses[j-1][k]} \n Critique this output and provide an improved response if possible"
                 print("model response:", response)
                 inputs = processor(text=revision_cue, images=image, return_tensors="pt").to(device)
@@ -102,9 +102,9 @@ for i in range(len(image_subset)):
             response_list.append(responses)
 
 with open("results.txt", "w") as f:
-    for i,q in enumerate(questions):
+    for i,q in enumerate(prompts):
         f.write(f"Question {i+1}: {q}")
-        for j,r in enumerate(responses[:,i]):
+        for j,r in enumerate([row[i] for row in response_list]):
             f.write(f"Revision {j}: {r}")
         f.write("\n\n")
 
