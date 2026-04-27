@@ -69,9 +69,9 @@ for i in range(len(image_subset)):
             
             prompt.append("Does this galaxy have a spiral arm pattern?")
             
-            prompt.append("Is the central galaxy in this image more red or blue in color? What does this indicate about the galaxy's age and rate of star formation as a result?")
+            prompt.append("Is the central galaxy in this image more red or blue in color? What does this indicate about the galaxy's age and rate of star formation as a result? Please list the steps in your reasoning that led you to this conclusion.")
 
-            prompt.append("Please classify the galaxy in this image into one of the following: 'barred spiral', 'unbarred tight spiral', 'unbarred loose spiral', 'edge-on without bulge', or 'edge-on with bulge'")
+            prompt.append("Please classify the galaxy in this image into one of the following: 'barred spiral', 'unbarred tight spiral', 'unbarred loose spiral', 'edge-on without bulge', or 'edge-on with bulge'. Please list the steps in your reasoning that led you to this conclusion.")
 
             responses = []
             for p in prompt:
