@@ -13,7 +13,8 @@ from transformers import LlavaForConditionalGeneration, AutoProcessor
 # project name
 PROJECT_NAME = os.path.basename(os.getcwd())
 # directories
-SCRATCH_DIR = os.path.join("/anvil/scratch/x-mwhite2", PROJECT_NAME)
+SCRATCH_DIR = os.path.join("/anvil/scratch/x-mwhite2/llava_inference", PROJECT_N
+AME)
 MODEL_PATH = os.path.join(SCRATCH_DIR, "models", "llava-7b")
 DATASET_PATH = os.path.join(SCRATCH_DIR, "datasets", "galaxy_sample15.h5")
 
@@ -22,8 +23,8 @@ with h5py.File(DATASET_PATH, 'r') as F:
     labels = np.array(F['ans'])
 
 # device
-'''device = "cuda" if torch.cuda.is_available() else "cpu"
-print("using device:", device)''' 
+device = "cuda" if torch.cuda.is_available() else "cpu"
+print("using device:", device) 
 
 # load model and processor
 print("loading model and processor from:", MODEL_PATH)
@@ -31,9 +32,6 @@ model = LlavaForConditionalGeneration.from_pretrained(MODEL_PATH).to(device)
 processor = AutoProcessor.from_pretrained(MODEL_PATH)
 
 print(labels[0])
-
-
-
 
 ## select sample of 15 from images and labels
 	## 3 samples of barred spirals
@@ -47,13 +45,14 @@ print(labels[0])
 
 num_iter = 5
 
-for i in range(len(image_subset)):
+for i in range(len(images)):
 	 
-    print("caption:", label_subset[i])
-    image = Image.open(image_subset[i].convert("RGB"))
+    print("caption:", labels[i])
+    image_obj = Image.fromarray(images[i])
+    image = image_obj.convert("RGB")
 
     response_list = []
-    for j in range(len(num_iter)):
+    for j in range(num_iter):
         if j == 0:
             ## classify galaxy, also describe and explain galaxy
             
@@ -69,15 +68,22 @@ for i in range(len(image_subset)):
             
             prompt.append("Does this galaxy have a spiral arm pattern?")
             
-            prompt.append("Is the central galaxy in this image more red or blue in color? What does this indicate about the galaxy's age and rate of star formation as a result? Please list the steps in your reasoning that led you to this conclusion.")
+            prompt.append("Is the central galaxy in this image more red or blue 
+in color? What does this indicate about the galaxy's age and rate of star format
+ion as a result? Please list the steps in your reasoning that led you to this co
+nclusion.")
 
-            prompt.append("Please classify the galaxy in this image into one of the following: 'barred spiral', 'unbarred tight spiral', 'unbarred loose spiral', 'edge-on without bulge', or 'edge-on with bulge'. Please list the steps in your reasoning that led you to this conclusion.")
+            prompt.append("Please classify the galaxy in this image into one of 
+the following: 'barred spiral', 'unbarred tight spiral', 'unbarred loose spiral'
+, 'edge-on without bulge', or 'edge-on with bulge'. Please list the steps in you
+r reasoning that led you to this conclusion.")
 
             responses = []
             for p in prompt:
                 question = "<image>\n"+p
 
-                inputs = processor(text=question, images=image, return_tensors="pt").to(device)
+                inputs = processor(text=question, images=image, return_tensors="
+pt").to(device)
                 print("generating caption...")
                 output = model.generate(**inputs, max_new_tokens=50)
                 response = processor.decode(output[0], skip_special_tokens=True)
@@ -91,10 +97,13 @@ for i in range(len(image_subset)):
 
         else:
             responses = []
-            for k, p in enumerate(prompts):
-                revision_cue = "<image>\n"+f"Here is the previous prompt for the attached image: {p} \n the corresponding output was: {responses[j-1][k]} \n Critique this output and provide an improved response if possible"
+            for k, p in enumerate(prompt):
+                revision_cue = "<image>\n"+f"Here is the previous prompt for the
+ attached image: {p} \n the corresponding output was: {response_list[j-1][k]} \n
+ Critique this output and provide an improved response if possible"
                 print("model response:", response)
-                inputs = processor(text=revision_cue, images=image, return_tensors="pt").to(device)
+                inputs = processor(text=revision_cue, images=image, return_tenso
+rs="pt").to(device)
                 print("generating revision...")
                 output = model.generate(**inputs, max_new_tokens=50)
                 response = processor.decode(output[0], skip_special_tokens=True)
@@ -102,7 +111,7 @@ for i in range(len(image_subset)):
             response_list.append(responses)
 
 with open("results.txt", "w") as f:
-    for i,q in enumerate(prompts):
+    for i,q in enumerate(prompt):
         f.write(f"Question {i+1}: {q}")
         for j,r in enumerate([row[i] for row in response_list]):
             f.write(f"Revision {j}: {r}")
