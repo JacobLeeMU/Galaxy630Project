@@ -13,8 +13,7 @@ from transformers import LlavaForConditionalGeneration, AutoProcessor
 # project name
 PROJECT_NAME = os.path.basename(os.getcwd())
 # directories
-SCRATCH_DIR = os.path.join("/anvil/scratch/x-mwhite2/llava_inference", PROJECT_N
-AME)
+SCRATCH_DIR = os.path.join("/anvil/scratch/x-mwhite2/llava_inference", PROJECT_NAME)
 MODEL_PATH = os.path.join(SCRATCH_DIR, "models", "llava-7b")
 DATASET_PATH = os.path.join(SCRATCH_DIR, "datasets", "galaxy_sample15.h5")
 
@@ -68,25 +67,19 @@ for i in range(len(images)):
             
             prompt.append("Does this galaxy have a spiral arm pattern?")
             
-            prompt.append("Is the central galaxy in this image more red or blue 
-in color? What does this indicate about the galaxy's age and rate of star format
-ion as a result? Please list the steps in your reasoning that led you to this co
-nclusion.")
+            prompt.append("Is the central galaxy in this image more red or blue in color? What does this indicate about the galaxy's age and rate of star formation as a result? Please list the steps in your reasoning that led you to this conclusion.")
 
-            prompt.append("Please classify the galaxy in this image into one of 
-the following: 'barred spiral', 'unbarred tight spiral', 'unbarred loose spiral'
-, 'edge-on without bulge', or 'edge-on with bulge'. Please list the steps in you
-r reasoning that led you to this conclusion.")
+            prompt.append("Please classify the galaxy in this image into one of the following: 'barred spiral', 'unbarred tight spiral', 'unbarred loose spiral', 'edge-on without bulge', or 'edge-on with bulge'. Please list the steps in your reasoning that led you to this conclusion.")
 
             responses = []
             for p in prompt:
                 question = "<image>\n"+p
 
-                inputs = processor(text=question, images=image, return_tensors="
-pt").to(device)
+                inputs = processor(text=question, images=image, return_tensors="pt").to(device)
+                input_len = inputs["input_ids"].shape[-1]
                 print("generating caption...")
-                output = model.generate(**inputs, max_new_tokens=50)
-                response = processor.decode(output[0], skip_special_tokens=True)
+                output = model.generate(**inputs, max_new_tokens=500)
+                response = processor.decode(output[0][input_len:], skip_special_tokens=True)
                 responses.append(response)
 
                 # print output
@@ -98,15 +91,14 @@ pt").to(device)
         else:
             responses = []
             for k, p in enumerate(prompt):
-                revision_cue = "<image>\n"+f"Here is the previous prompt for the
- attached image: {p} \n the corresponding output was: {response_list[j-1][k]} \n
- Critique this output and provide an improved response if possible"
+                revision_cue = "<image>\n"+f"Here is the previous prompt for the attached image: {p} \n the corresponding output was: {response_list[j-1][k]} \nCritique this output and provide an improved response if possible"
                 print("model response:", response)
-                inputs = processor(text=revision_cue, images=image, return_tenso
-rs="pt").to(device)
+                inputs = processor(text=revision_cue, images=image, return_tensors="pt").to(device)
+                input_len = inputs["input_ids"].shape[-1] #Gets the response length
                 print("generating revision...")
-                output = model.generate(**inputs, max_new_tokens=50)
-                response = processor.decode(output[0], skip_special_tokens=True)
+                output = model.generate(**inputs, max_new_tokens=500)
+                response = processor.decode(output[0][input_len:], skip_special_tokens=True) #Slices off everything before input_len
+                print("model response:", response)
                 responses.append(response)
             response_list.append(responses)
 
