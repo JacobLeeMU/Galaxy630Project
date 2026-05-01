@@ -44,11 +44,16 @@ print(labels[0])
 
 num_iter = 5
 
+f = open("results.txt", "w")
+
 for i in range(len(images)):
 	 
     print("caption:", labels[i])
     image_obj = Image.fromarray(images[i])
     image = image_obj.convert("RGB")
+
+    print(f'\n image {i+1}\n')
+    f.write(f'image {i+1}\n')
 
     response_list = []
     for j in range(num_iter):
@@ -102,10 +107,9 @@ for i in range(len(images)):
                 responses.append(response)
             response_list.append(responses)
 
-with open("results.txt", "w") as f:
     for i,q in enumerate(prompt):
-        f.write(f"Question {i+1}: {q}")
+        f.write(f"Question {i+1}: {q}\n")
         for j,r in enumerate([row[i] for row in response_list]):
-            f.write(f"Revision {j}: {r}")
+            f.write(f"Revision {j}: {r}\n")
         f.write("\n\n")
 
